@@ -1,0 +1,190 @@
+# 1) Project setup and packages
+
+**Goal:** Unity 2022 LTS URP project with packages, scenes, folders, and build settings.
+**Deliverables:** URP, Addressables, Input System, TMP, Localization, Cinemachine, Newtonsoft JSON, NUnit, IAP/Analytics stubs. Scenes: Boot, HomeBase, WorldMap, Combat, UINav.
+
+**Prompt:**
+Copy and run:
+“Create a Unity 2022.3 URP project named \[ProjectName]. Add these packages: URP, Addressables, Input System, TextMeshPro, Localization, Cinemachine, Newtonsoft JSON, NUnit, IAP stub, Analytics stub. Make folders:
+Assets/Art, Audio, Fonts, Scripts/Core, Scripts/Systems, Scripts/Tools, Scripts/Features/{BaseBuilding,Heroes,Combat,Gacha,Quests,Economy,Map,Research,AFK}, ScriptableObjects, Resources/Data, Prefabs, Scenes, UI, Editor, Tests.
+Add scenes Boot, HomeBase, WorldMap, Combat, UINav to Build Settings. Configure portrait, 1080x1920 reference, IL2CPP, ARM64, Strip Engine Code, URP asset. Provide minimal scripts to compile.”
+
+# 2) Source control and CI
+
+**Goal:** Git layout and CI to build Android and iOS.
+**Deliverables:** .gitignore, Unity YAML settings, GitHub Actions or GitLab CI.
+
+**Prompt:**
+“Generate .gitignore for Unity, a README build checklist, and a GitHub Actions workflow that runs editor tests and makes Development builds for Android and iOS. Include steps to cache Library, run Addressables build, and produce build artifacts.”
+
+# 3) Core architecture and state flow
+
+**Goal:** Domain, Systems, Presentation layers. App states: Boot, Home, Map, Combat, Results. Event bus.
+**Deliverables:** Game singleton, state switch, event bus, scene loader.
+
+**Prompt:**
+“Implement core architecture: SL.Core Game singleton with AppState enum, event bus, scene loader utility, and a Boot flow that initializes services then loads HomeBase. Provide unit tests for state transitions.”
+
+# 4) Save and profile
+
+**Goal:** Versioned save with XOR or AES, checksum, rollback, migration hook.
+**Deliverables:** SaveService, SaveData model, corrupt handling, test.
+
+**Prompt:**
+“Create SaveService with JSON save at Application.persistentDataPath, version field, XOR or AES encryption, SHA-256 checksum, rollback on corruption, and migration stub. Add NUnit tests for roundtrip, corruption recovery, and version bump migration.”
+
+# 5) Data pipeline and CSV import
+
+**Goal:** Data driven content.
+**Deliverables:** ScriptableObjects for currencies, buildings, heroes, skills, status effects, items, chapters, nodes, drop tables, rewards, banners. CSV import editor tool.
+
+**Prompt:**
+“Add ScriptableObject definitions for Currencies, Buildings, Heroes, Skills, StatusEffects, Items, Chapters, Nodes, DropTables, Rewards, Banners. Build an Editor importer that reads CSVs in Assets/Resources/Data and materializes or updates SOs. Include a reimport menu and change log.”
+
+# 6) Currency and rewards
+
+**Goal:** Atomic balance updates and UI flyouts.
+**Deliverables:** CurrencyService, RewardService, reward animation stub, tests.
+
+**Prompt:**
+“Implement CurrencyService with Soft, Premium, Energy, Parts, Research, Shards. Implement RewardService that grants bundles, logs to save, and triggers a UI flyout message bus event. Add NUnit tests for atomic grant and persistence.”
+
+# 7) Base building and construction timers
+
+**Goal:** Upgradeable buildings with prerequisites.
+**Deliverables:** Building SO schema, upgrade queue, speedups, free finish threshold, persistence.
+
+**Prompt:**
+“Create BaseBuilding system: BuildingSO with id, level data, costs, time, effects, prereqs. Implement a construction queue with start, accelerate using soft currency, free finish under \[N] minutes. Persist timers across reload via timestamps. Provide a simple HomeBase UI with building cards and Upgrade buttons.”
+
+# 8) Energy and global timers
+
+**Goal:** Server independent time.
+**Deliverables:** TimerService, Energy regen by HQ level, offline catchup, tests.
+
+**Prompt:**
+“Build TimerService with UTC timestamps and elapsed calculations. Create EnergyService with regen rate based on HQ level, max cap, and offline catchup using lastLogin. Include tests for 3 hour simulated offline and cap behavior.”
+
+# 9) Hero inventory and skills
+
+**Goal:** Collectible heroes, leveling, shards, promotions.
+**Deliverables:** HeroSO, SkillSO, inventory, leveling curves, shard promote, equipment stubs.
+
+**Prompt:**
+“Implement HeroInventory with add, owns, level up, and promotion using shards. Define class enums (Vanguard, Marksman, Support, Controller, Defender), rarities (C, R, SR, UR), and elements with advantage triangle. Add two active skills plus one passive per hero. Provide 12 original heroes as data assets and a minimal Heroes UI for list, details, level, and promote.”
+
+# 10) Isometric presentation
+
+**Goal:** 2.5D isometric readability.
+**Deliverables:** Cinemachine camera with 30 to 35 degree tilt, grid, safe zoom, unit billboarding.
+
+**Prompt:**
+“Set up an isometric camera using Cinemachine and URP. Support orthographic and low FOV perspective modes. Add grid helpers, clamp zoom, and unit billboarding. Ensure no near clip of buildings. Add safe area Canvas fitter and a simple HUD frame.”
+
+# 11) Combat loop and HUD
+
+**Goal:** 5v5 auto battler with manual ults.
+**Deliverables:** Team formation presets, target selection by role, wave controller, results. Ult buttons.
+
+**Prompt:**
+“Create 5v5 auto combat on a compact isometric arena. Add formation presets, role-based target selection, ult gauge and manual ult button per hero. Implement waves, win on wipe or timer survive, and a Results screen with rewards and stars. Provide a headless sim harness with deterministic seed. Include tests that run 100 sims and assert variance bounds.”
+
+# 12) World map and chapters
+
+**Goal:** Chaptered progression.
+**Deliverables:** 12 chapters x 10 nodes, bosses at node 10, star rules, first clear and repeat rewards.
+
+**Prompt:**
+“Implement WorldMap UI with chapter and node buttons. Nodes cost energy and return rewards. Track stars for no deaths, time clear threshold, and energy remaining. Unlock next node and chapter boss gates. Populate 12x10 data from CSV. Add a quick travel back to HomeBase.”
+
+# 13) AFK rewards and offline progression
+
+**Goal:** Idle loop with cap and claim UI.
+**Deliverables:** AFK calculation, caps by HQ level, claim panel and logs, tests.
+
+**Prompt:**
+“Build AFKService using elapsed time since anchor, capped by HQ-based hours. Calculate soft currency, parts, and shards tick rates. Provide a Claim AFK panel showing projected rewards and cap state. Add tests for 6 hour offline and cap respect.”
+
+# 14) Quests, achievements, and login rewards
+
+**Goal:** Short term loops.
+**Deliverables:** Daily and weekly quest lists with UTC reset, achievements, login calendar.
+
+**Prompt:**
+“Create Quests system with daily and weekly lists driven by CSV. Track progress via event bus, implement claim flow, and UTC reset at \[00:00] with local countdown. Add Achievements for lifetime goals and a 7 day login calendar. Provide a Quests UI with filters and claim confirmations.”
+
+# 15) Research tech tree
+
+**Goal:** Linear branches with modifiers.
+**Deliverables:** Research tree UI, costs, time, effect application via modifier system.
+
+**Prompt:**
+“Implement Research system with linear branches. Each tech has cost, time, and effect key-value pairs that modify systems like energy cap, build speed, combat stats, AFK cap. Add a Research Lab UI showing active timer and queue 1. Persist progress across sessions.”
+
+# 16) Gacha with pity and shard conversion
+
+**Goal:** Summon loop with transparent odds.
+**Deliverables:** Banners, rarity weights, pity counter, duplicate to shards, probability panel.
+
+**Prompt:**
+“Create Gacha system with banners defined in banners.csv. Implement rarity weights, pity counter that increases UR odds per pull up to a max, 10 pull flow, and duplicate conversion to shards. Expose probabilities and pity state in a banner info panel. Add a fake store stub for QA currency purchase. Include tests for pity math and distribution tolerance.”
+
+# 17) Economy and Balance Inspector
+
+**Goal:** Fast tuning.
+**Deliverables:** Curves for costs, timers, XP, drop tables in CSV. Editor window to adjust and write back.
+
+**Prompt:**
+“Add economy curves for costs, timers, XP, drop rates in CSVs. Build a Balance Inspector editor window to edit scalars and curves, push back to CSV, and refresh SOs. Provide a Tuning Guide markdown explaining early game time to Chapter 2 and target session lengths.”
+
+# 18) UI framework and navigation
+
+**Goal:** Consistent navigation and safe area UI.
+**Deliverables:** UINav scene, top bar currencies, tab bar, modal system, back stack.
+
+**Prompt:**
+“Create a UI navigation framework: top currency bar, bottom tab bar for Home, Map, Heroes, Research, Gacha, Quests. Add a modal manager and a back stack handler. All canvases must be safe area aware. Provide a simple theme and icon placeholders.”
+
+# 19) Onboarding tutorial
+
+**Goal:** First session guidance to reach 1-5.
+**Deliverables:** Step system, masks, callouts, gating.
+
+**Prompt:**
+“Implement a guided onboarding that covers first building upgrade, first battle, first summon, and first research. Use a ScriptableObject step list with gates and callouts. Persist progress. Ensure a new user can reach Chapter 1 Node 5 within 10 minutes.”
+
+# 20) Audio, VFX, haptics
+
+**Goal:** Feedback without noise.
+**Deliverables:** UI SFX set, short music loop, battle impact cues, ult VFX, optional haptics.
+
+**Prompt:**
+“Add an AudioManager with categories for UI, Music, SFX. Create short original UI clicks, confirm, error, and a 20 to 30 second music loop. Add simple URP particle VFX for hits, crits, and ultimate casts. Hook optional haptics on crits and boss telegraphs with a toggle in Settings.”
+
+# 21) QA harness, cheats, and tests
+
+**Goal:** Fast iteration.
+**Deliverables:** Editor cheats, smoke test scene, NUnit coverage.
+
+**Prompt:**
+“Create an Editor-only QA panel for grant currency, unlock heroes, force AFK time, time skip, and fast win in combat. Add a SmokeTest scene that initializes systems, runs a short battle, and reports pass. Expand NUnit tests for DropTableRoll variance, RewardGrants atomicity, EnergyRegen math, AFKCalculation, and PityCounter.”
+
+# 22) Build and store stubs
+
+**Goal:** Device builds.
+**Deliverables:** Android and iOS build profiles, fake store, analytics stub, addressables build step.
+
+**Prompt:**
+“Set up Build Settings for Android and iOS with IL2CPP, ARM64, stripping. Add an in-game Fake Store with preset offers that adjust soft, premium, and gacha tickets. Add Analytics stubs that log funnel events locally. Provide build scripts that run Addressables build before making APK and Xcode project.”
+
+# 23) Performance and polish
+
+**Goal:** 60 fps on mid tier Android.
+**Deliverables:** Batching, GPU instancing, lightweight shaders, poolers, frame budget checks.
+
+**Prompt:**
+“Profile on a mid tier Android profile setting. Enable SRP Batcher, GPU instancing, and sprite or simple lit shaders. Add object pools for combat units and VFX. Cap expensive updates, decouple UI animations from gameplay. Provide a checklist and a simple frame-time HUD with moving average.”
+
+---
+
+If you want, tell me which step to start with and paste the matching prompt. I will generate the code, assets, and tests for that section.
